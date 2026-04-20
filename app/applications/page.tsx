@@ -14,9 +14,10 @@ export default async function ApplicationsPage() {
   }
 
   let applications: ApplicationWithReport[] = []
+  const cookieHeader = cookies().toString()
   try {
     const res = await fetch(`${process.env.NEXTAUTH_URL}/api/applications`, {
-      headers: { cookie: cookies().toString() },
+      headers: { cookie: cookieHeader },
       cache: 'no-store',
     })
     if (res.ok) {

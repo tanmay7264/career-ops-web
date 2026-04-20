@@ -16,9 +16,10 @@ export default async function ReportPage({ params }: { params: { id: string } })
   }
 
   let report: ReportWithApplication | null = null
+  const cookieHeader = cookies().toString()
   try {
     const res = await fetch(`${process.env.NEXTAUTH_URL}/api/reports/${params.id}`, {
-      headers: { cookie: cookies().toString() },
+      headers: { cookie: cookieHeader },
       cache: 'no-store',
     })
     if (res.ok) {

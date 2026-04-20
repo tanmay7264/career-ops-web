@@ -64,6 +64,8 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    // Capture current state before update
+    const previousApplications = applications.slice()
     // optimistic update
     setApplications((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)),
@@ -77,11 +79,24 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
         body: JSON.stringify({ status: newStatus }),
       })
       if (!res.ok) {
-        // revert on failure
-        setApplications(initialApplications)
+        // Revert only the specific application that failed
+        setApplications((prev) =>
+          prev.map((a) =>
+            a.id === id
+              ? { ...a, status: previousApplications.find((p) => p.id === id)?.status ?? a.status }
+              : a,
+          ),
+        )
       }
     } catch {
-      setApplications(initialApplications)
+      // Revert only the specific application that failed
+      setApplications((prev) =>
+        prev.map((a) =>
+          a.id === id
+            ? { ...a, status: previousApplications.find((p) => p.id === id)?.status ?? a.status }
+            : a,
+        ),
+      )
     }
   }
 
@@ -113,6 +128,7 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
     { label: 'Role', key: 'role' },
     { label: 'Score', key: 'score' },
     { label: 'Status', key: 'status' },
+    { label: 'Date', key: 'createdAt' },
   ]
 
   return (
@@ -196,9 +212,6 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
                   <SortIcon col={key} />
                 </th>
               ))}
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                Date
-              </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
                 Report
               </th>
