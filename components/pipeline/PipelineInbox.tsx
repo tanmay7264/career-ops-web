@@ -97,7 +97,11 @@ export function PipelineInbox() {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`/api/pipeline?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/pipeline?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        toast.error('Failed to remove item')
+        return
+      }
       setItems((prev) => prev.filter((item) => item.id !== id))
       toast.success('Removed from pipeline')
     } catch {
@@ -105,7 +109,7 @@ export function PipelineInbox() {
     }
   }
 
-  const evaluateItem = async (item: PipelineItem) => {
+  const evaluateItem = async (item: PipelineItem, skipNavigation = false) => {
     setItems((prev) =>
       prev.map((i) => (i.id === item.id ? { ...i, status: 'evaluating' } : i))
     )
@@ -138,10 +142,12 @@ export function PipelineInbox() {
         prev.map((i) => (i.id === item.id ? { ...i, status: 'done' } : i))
       )
 
-      if (reportId) {
-        router.push(`/reports/${reportId}`)
-      } else {
-        toast.success('Evaluation complete')
+      if (!skipNavigation) {
+        if (reportId) {
+          router.push(`/reports/${reportId}`)
+        } else {
+          toast.success('Evaluation complete')
+        }
       }
     } catch {
       setItems((prev) =>
@@ -158,8 +164,9 @@ export function PipelineInbox() {
       return
     }
     for (const item of pending) {
-      await evaluateItem(item)
+      await evaluateItem(item, true)
     }
+    router.push('/applications')
   }
 
   if (loading) {
