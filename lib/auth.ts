@@ -6,6 +6,7 @@ import { prisma } from './prisma'
 declare module 'next-auth' {
   interface Session {
     user: { id: string } & DefaultSession['user']
+    onboarded?: boolean
   }
 }
 
@@ -40,7 +41,7 @@ export const authOptions: NextAuthOptions = {
     session: async ({ session, token }) => {
       if (session.user && token) {
         session.user.id = token.userId as string
-        ;(session as { onboarded?: boolean }).onboarded = token.onboarded as boolean | undefined
+        session.onboarded = token.onboarded as boolean | undefined
       }
       return session
     },
