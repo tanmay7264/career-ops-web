@@ -1,25 +1,26 @@
-import { createAnthropic } from '@ai-sdk/anthropic'
+import { createGroq } from '@ai-sdk/groq'
 
-const globalForAnthropic = globalThis as unknown as { anthropic: ReturnType<typeof createAnthropic> }
+const globalForGroq = globalThis as unknown as { groqClient: ReturnType<typeof createGroq> }
 
-function getAnthropic() {
-  if (!globalForAnthropic.anthropic) {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+function getGroq() {
+  if (!globalForGroq.groqClient) {
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error('GROQ_API_KEY environment variable is not set')
     }
-    globalForAnthropic.anthropic = createAnthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+    globalForGroq.groqClient = createGroq({
+      apiKey: process.env.GROQ_API_KEY,
     })
   }
-  return globalForAnthropic.anthropic
+  return globalForGroq.groqClient
 }
 
-export const anthropic: ReturnType<typeof createAnthropic> = new Proxy({} as ReturnType<typeof createAnthropic>, {
+// Exported as `anthropic` so existing imports in evaluate/route.ts don't need to change
+export const anthropic: ReturnType<typeof createGroq> = new Proxy({} as ReturnType<typeof createGroq>, {
   apply(_target, _thisArg, args) {
-    return (getAnthropic() as unknown as (...a: unknown[]) => unknown)(...args)
+    return (getGroq() as unknown as (...a: unknown[]) => unknown)(...args)
   },
   get(_target, prop) {
-    const instance = getAnthropic()
+    const instance = getGroq()
     const value = (instance as unknown as Record<string | symbol, unknown>)[prop]
     return typeof value === 'function' ? value.bind(instance) : value
   },

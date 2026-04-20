@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   const capturedUrl = url
 
   const result = streamText({
-    model: anthropic('claude-3-5-sonnet-20241022'),
+    model: anthropic('llama-3.3-70b-versatile'),
     prompt: evaluationPrompt,
   })
 
