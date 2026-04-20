@@ -44,29 +44,29 @@ export function Step1Profile({ onNext, defaultValues }: Props) {
         <form onSubmit={handleSubmit(onNext)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Field label="Full Name *" error={errors.fullName?.message}>
-              <Input {...register('fullName')} placeholder="Jane Doe" className={cn(errors.fullName && 'border-red-400 bg-red-50')} />
+              <Input {...register('fullName')} placeholder="Rahul Sharma" className={cn(errors.fullName && 'border-red-400 bg-red-50')} />
             </Field>
             <Field label="Location *" error={errors.location?.message}>
-              <Input {...register('location')} placeholder="San Francisco, CA" className={cn(errors.location && 'border-red-400 bg-red-50')} />
+              <Input {...register('location')} placeholder="Bengaluru, India" className={cn(errors.location && 'border-red-400 bg-red-50')} />
             </Field>
             <Field label="Target Role(s) *" error={errors.targetRoles?.message}>
-              <Input {...register('targetRoles')} placeholder="Head of AI, AI PM" className={cn(errors.targetRoles && 'border-red-400 bg-red-50')} />
+              <Input {...register('targetRoles')} placeholder="AI Product Manager, Head of AI" className={cn(errors.targetRoles && 'border-red-400 bg-red-50')} />
             </Field>
             <Field label="Seniority *" error={errors.seniority?.message}>
-              <Input {...register('seniority')} placeholder="Director / VP / IC5+" className={cn(errors.seniority && 'border-red-400 bg-red-50')} />
+              <Input {...register('seniority')} placeholder="Senior / Lead / Director / VP" className={cn(errors.seniority && 'border-red-400 bg-red-50')} />
             </Field>
-            <Field label="Min Salary (USD) *" error={errors.salaryMin?.message}>
-              <Input {...register('salaryMin', { valueAsNumber: true })} type="number" placeholder="180000" className={cn(errors.salaryMin && 'border-red-400 bg-red-50')} />
+            <Field label="Min Salary (₹ LPA) *" error={errors.salaryMin?.message}>
+              <Input {...register('salaryMin', { valueAsNumber: true })} type="number" placeholder="20" className={cn(errors.salaryMin && 'border-red-400 bg-red-50')} />
             </Field>
-            <Field label="Max Salary (USD) *" error={errors.salaryMax?.message}>
-              <Input {...register('salaryMax', { valueAsNumber: true })} type="number" placeholder="240000" className={cn(errors.salaryMax && 'border-red-400 bg-red-50')} />
+            <Field label="Max Salary (₹ LPA) *" error={errors.salaryMax?.message}>
+              <Input {...register('salaryMax', { valueAsNumber: true })} type="number" placeholder="40" className={cn(errors.salaryMax && 'border-red-400 bg-red-50')} />
             </Field>
           </div>
           <Field label="Your Superpower *" error={errors.superpower?.message}>
             <Textarea
               {...register('superpower')}
               rows={3}
-              placeholder="I turn ambiguous AI opportunities into shipped products..."
+              placeholder="I build AI-led products that move business metrics across India's fastest-growing tech companies..."
               className={cn(errors.superpower && 'border-red-400 bg-red-50')}
             />
           </Field>

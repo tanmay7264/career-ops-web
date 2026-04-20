@@ -21,7 +21,7 @@ export function SettingsTabs({ profile: initialProfile }: SettingsTabsProps) {
   const [seniority, setSeniority] = useState(profile.seniority ?? '')
   const [salaryMin, setSalaryMin] = useState(String(profile.salaryMin ?? ''))
   const [salaryMax, setSalaryMax] = useState(String(profile.salaryMax ?? ''))
-  const [currency, setCurrency] = useState(profile.currency ?? 'USD')
+  const [currency, setCurrency] = useState(profile.currency ?? 'INR')
   const [superpower, setSuperpower] = useState(profile.superpower ?? '')
   const [profileSaving, setProfileSaving] = useState(false)
 
@@ -172,7 +172,7 @@ export function SettingsTabs({ profile: initialProfile }: SettingsTabsProps) {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Salary Min</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Salary Min (₹ LPA)</label>
                 <input
                   type="number"
                   value={salaryMin}
@@ -181,7 +181,7 @@ export function SettingsTabs({ profile: initialProfile }: SettingsTabsProps) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Salary Max</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Salary Max (₹ LPA)</label>
                 <input
                   type="number"
                   value={salaryMax}
@@ -195,7 +195,7 @@ export function SettingsTabs({ profile: initialProfile }: SettingsTabsProps) {
                   type="text"
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  placeholder="USD"
+                  placeholder="INR"
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>

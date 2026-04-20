@@ -64,7 +64,7 @@ model Profile {
   seniority   String
   salaryMin   Int
   salaryMax   Int
-  currency    String   @default("USD")
+  currency    String   @default("INR")
   superpower  String   @db.Text
   cvMarkdown  String   @db.Text
   portalsYaml String   @db.Text

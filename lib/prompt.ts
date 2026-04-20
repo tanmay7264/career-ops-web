@@ -1,7 +1,10 @@
 import type { Profile } from './generated/prisma'
 
 export function buildEvaluationPrompt(profile: Profile, jdText: string, url?: string): string {
-  const salaryRange = `${profile.salaryMin}–${profile.salaryMax} ${profile.currency ?? 'USD'}`
+  const currency = profile.currency ?? 'INR'
+  const salaryRange = currency === 'INR'
+    ? `₹${profile.salaryMin}–${profile.salaryMax} LPA`
+    : `${profile.salaryMin}–${profile.salaryMax} ${currency}`
 
   const lines: string[] = [
     '# Job Offer Evaluation',
