@@ -96,7 +96,7 @@ model Report {
   userId        String
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   applicationId String?      @unique
-  application   Application? @relation(fields: [applicationId], references: [id])
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
   url           String?
   content       String       @db.Text
   legitimacy    String?
@@ -112,4 +112,5 @@ model PipelineItem {
   role      String?
   status    String   @default("pending")
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

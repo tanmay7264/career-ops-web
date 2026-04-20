@@ -8,6 +8,9 @@ export const profileStep1Schema = z.object({
   salaryMin: z.number().min(1, 'Minimum salary is required'),
   salaryMax: z.number().min(1, 'Maximum salary is required'),
   superpower: z.string().min(10, 'Tell us more about your superpower'),
+}).refine(d => d.salaryMax >= d.salaryMin, {
+  message: 'Maximum salary must be at least equal to minimum salary',
+  path: ['salaryMax'],
 })
 
 export const profileStep2Schema = z.object({
@@ -21,7 +24,7 @@ export const profileStep3Schema = z.object({
 })
 
 export const evaluateSchema = z.object({
-  url: z.string().url().optional().or(z.literal('')),
+  url: z.string().url().or(z.literal('')).optional(),
   jdText: z.string().optional(),
 }).refine(d => d.url || d.jdText, {
   message: 'Provide a URL or paste JD text',
@@ -36,3 +39,5 @@ export const applicationUpdateSchema = z.object({
 export type ProfileStep1 = z.infer<typeof profileStep1Schema>
 export type ProfileStep2 = z.infer<typeof profileStep2Schema>
 export type ProfileStep3 = z.infer<typeof profileStep3Schema>
+export type EvaluateInput = z.infer<typeof evaluateSchema>
+export type ApplicationUpdate = z.infer<typeof applicationUpdateSchema>
