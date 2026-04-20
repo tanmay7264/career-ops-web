@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button'
 interface StreamingEvaluationProps {
   completion: string
   isLoading: boolean
+  reportId?: string | null
 }
 
-export function StreamingEvaluation({ completion, isLoading }: StreamingEvaluationProps) {
+export function StreamingEvaluation({ completion, isLoading, reportId }: StreamingEvaluationProps) {
   if (!completion && !isLoading) return null
 
   const scoreMatch = completion.match(/SCORE:\s*(\d+\.?\d*)/)
@@ -50,7 +51,7 @@ export function StreamingEvaluation({ completion, isLoading }: StreamingEvaluati
       {isDone && (
         <div className="pt-2 border-t border-gray-200 flex items-center gap-3">
           <p className="text-sm text-green-700 font-medium">Evaluation complete.</p>
-          <Link href="/applications">
+          <Link href={reportId ? `/reports/${reportId}` : '/applications'}>
             <Button variant="outline" size="sm">
               View saved report
             </Button>

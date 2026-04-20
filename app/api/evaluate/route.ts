@@ -62,47 +62,48 @@ export async function POST(req: NextRequest) {
   const result = streamText({
     model: anthropic('claude-3-5-sonnet-20241022'),
     prompt: evaluationPrompt,
-    onFinish: async ({ text }) => {
-      // parse score
-      const scoreMatch = text.match(/SCORE:\s*(\d+\.?\d*)/)
-      const score = scoreMatch ? parseFloat(scoreMatch[1]) : null
-      // parse legitimacy
-      const legitMatch = text.match(/LEGITIMACY:\s*(REAL|SUSPICIOUS|FAKE)/)
-      const legitimacy = legitMatch ? legitMatch[1] : null
-      // get next application num
-      const lastApp = await prisma.application.findFirst({
-        where: { userId },
-        orderBy: { num: 'desc' },
-        select: { num: true },
-      })
-      const nextNum = (lastApp?.num ?? 0) + 1
-      // extract company + role from JD text (simple heuristic: first non-empty lines)
-      const lines = capturedJdText.trim().split('\n').filter(Boolean)
-      const company = lines[0]?.substring(0, 100) || 'Unknown Company'
-      const role = lines[1]?.substring(0, 100) || 'Unknown Role'
-      // create application
-      const app = await prisma.application.create({
-        data: {
-          userId,
-          num: nextNum,
-          company,
-          role,
-          score,
-          status: 'Evaluated',
-        },
-      })
-      // create report
-      await prisma.report.create({
-        data: {
-          userId,
-          applicationId: app.id,
-          url: capturedUrl || null,
-          content: text,
-          legitimacy,
-        },
-      })
+  })
+
+  const encoder = new TextEncoder()
+  let fullText = ''
+
+  const transformedStream = new ReadableStream({
+    async start(controller) {
+      for await (const chunk of result.textStream) {
+        fullText += chunk
+        controller.enqueue(encoder.encode(chunk))
+      }
+      // After stream ends, save to DB
+      try {
+        const scoreMatch = fullText.match(/SCORE:\s*(\d+\.?\d*)/)
+        const score = scoreMatch ? parseFloat(scoreMatch[1]) : null
+        const legitMatch = fullText.match(/LEGITIMACY:\s*(REAL|SUSPICIOUS|FAKE)/)
+        const legitimacy = legitMatch ? legitMatch[1] : null
+        const lastApp = await prisma.application.findFirst({
+          where: { userId },
+          orderBy: { num: 'desc' },
+          select: { num: true },
+        })
+        const nextNum = (lastApp?.num ?? 0) + 1
+        const lines = capturedJdText.trim().split('\n').filter(Boolean)
+        const company = lines[0]?.substring(0, 100) || 'Unknown Company'
+        const role = lines[1]?.substring(0, 100) || 'Unknown Role'
+        const app = await prisma.application.create({
+          data: { userId, num: nextNum, company, role, score, status: 'Evaluated' },
+        })
+        const report = await prisma.report.create({
+          data: { userId, applicationId: app.id, url: capturedUrl || null, content: fullText, legitimacy },
+        })
+        // Send special final chunk with report ID
+        controller.enqueue(encoder.encode(`\n\nREPORT_ID:${report.id}`))
+      } catch (e) {
+        console.error('Failed to save evaluation:', e)
+      }
+      controller.close()
     },
   })
 
-  return result.toTextStreamResponse()
+  return new Response(transformedStream, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  })
 }

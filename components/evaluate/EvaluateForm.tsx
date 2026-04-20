@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 interface EvaluateFormProps {
-  onComplete?: (completion: string) => void
+  onComplete?: (reportId: string | null) => void
   onLoadingChange?: (loading: boolean) => void
   onCompletionChange?: (completion: string) => void
 }
@@ -59,12 +59,17 @@ export function EvaluateForm({ onComplete, onLoadingChange, onCompletionChange }
 
         const chunk = decoder.decode(value, { stream: true })
 
-        // toTextStreamResponse sends plain text chunks
         accumulated += chunk
         onCompletionChange?.(accumulated)
       }
 
-      onComplete?.(accumulated)
+      // Extract REPORT_ID from full accumulated text
+      const reportIdMatch = accumulated.match(/\nREPORT_ID:([a-zA-Z0-9]+)$/)
+      const reportId = reportIdMatch ? reportIdMatch[1] : null
+      // Strip the REPORT_ID line from displayed text
+      const cleanText = accumulated.replace(/\nREPORT_ID:[a-zA-Z0-9]+$/, '')
+      onCompletionChange?.(cleanText)
+      onComplete?.(reportId)
     } catch (err) {
       setValidationError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
