@@ -11,23 +11,27 @@ export async function GET() {
 
   const userId = session.user.id
 
-  const [total, applied, interviews, offers] = await Promise.all([
-    prisma.application.count({ where: { userId } }),
-    prisma.application.count({ where: { userId, status: { in: ['Applied', 'Responded', 'Interview', 'Offer'] } } }),
-    prisma.application.count({ where: { userId, status: 'Interview' } }),
-    prisma.application.count({ where: { userId, status: 'Offer' } }),
-  ])
+  try {
+    const [total, applied, interviews, offers] = await Promise.all([
+      prisma.application.count({ where: { userId } }),
+      prisma.application.count({ where: { userId, status: { in: ['Applied', 'Responded', 'Interview', 'Offer'] } } }),
+      prisma.application.count({ where: { userId, status: 'Interview' } }),
+      prisma.application.count({ where: { userId, status: 'Offer' } }),
+    ])
 
-  const avgScore = await prisma.application.aggregate({
-    where: { userId, score: { not: null } },
-    _avg: { score: true },
-  })
+    const avgScore = await prisma.application.aggregate({
+      where: { userId, score: { not: null } },
+      _avg: { score: true },
+    })
 
-  return NextResponse.json({
-    total,
-    applied,
-    interviews,
-    offers,
-    avgScore: avgScore._avg.score ? Number(avgScore._avg.score.toFixed(1)) : null,
-  })
+    return NextResponse.json({
+      total,
+      applied,
+      interviews,
+      offers,
+      avgScore: avgScore._avg.score ? Number(avgScore._avg.score.toFixed(1)) : null,
+    })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

@@ -9,13 +9,17 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const applications = await prisma.application.findMany({
-    where: { userId: session.user.id },
-    orderBy: { num: 'desc' },
-    include: { report: { select: { id: true } } },
-  })
+  try {
+    const applications = await prisma.application.findMany({
+      where: { userId: session.user.id },
+      orderBy: { num: 'desc' },
+      include: { report: { select: { id: true } } },
+    })
 
-  return NextResponse.json(applications)
+    return NextResponse.json(applications)
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -33,27 +37,31 @@ export async function POST(req: NextRequest) {
 
   const userId = session.user.id
 
-  const application = await prisma.$transaction(async (tx) => {
-    const lastApp = await tx.application.findFirst({
-      where: { userId },
-      orderBy: { num: 'desc' },
-      select: { num: true },
+  try {
+    const application = await prisma.$transaction(async (tx) => {
+      const lastApp = await tx.application.findFirst({
+        where: { userId },
+        orderBy: { num: 'desc' },
+        select: { num: true },
+      })
+      const nextNum = (lastApp?.num ?? 0) + 1
+      return tx.application.create({
+        data: {
+          userId,
+          num: nextNum,
+          company,
+          role,
+          score: score ?? null,
+          status: status ?? 'Evaluated',
+          notes: notes ?? null,
+          url: url ?? null,
+        },
+        include: { report: { select: { id: true } } },
+      })
     })
-    const nextNum = (lastApp?.num ?? 0) + 1
-    return tx.application.create({
-      data: {
-        userId,
-        num: nextNum,
-        company,
-        role,
-        score: score ?? null,
-        status: status ?? 'Evaluated',
-        notes: notes ?? null,
-        url: url ?? null,
-      },
-      include: { report: { select: { id: true } } },
-    })
-  })
 
-  return NextResponse.json(application, { status: 201 })
+    return NextResponse.json(application, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
