@@ -52,6 +52,10 @@ export function buildEvaluationPrompt(profile: Profile, jdText: string, url?: st
   lines.push('LEGITIMACY: SUSPICIOUS')
   lines.push('LEGITIMACY: FAKE')
   lines.push('Output exactly one of the three lines above, with no other text on that line.')
+  lines.push('')
+  lines.push('**Block H: Metadata** — At the very end of your response, output these two lines exactly:')
+  lines.push('COMPANY: [company name from the job posting]')
+  lines.push('ROLE: [exact job title from the posting]')
 
   return lines.join('\n')
 }

@@ -60,14 +60,16 @@ export function EvaluateForm({ onComplete, onLoadingChange, onCompletionChange }
         const chunk = decoder.decode(value, { stream: true })
 
         accumulated += chunk
-        onCompletionChange?.(accumulated)
+        // Strip any partial/complete REPORT_ID sentinel before displaying
+        const displayText = accumulated.replace(/\n\nREPORT_ID:[\w-]*$/, '')
+        onCompletionChange?.(displayText)
       }
 
       // Extract REPORT_ID from full accumulated text
-      const reportIdMatch = accumulated.match(/\nREPORT_ID:([a-zA-Z0-9]+)$/)
+      const reportIdMatch = accumulated.match(/\nREPORT_ID:([\w-]+)$/)
       const reportId = reportIdMatch ? reportIdMatch[1] : null
       // Strip the REPORT_ID line from displayed text
-      const cleanText = accumulated.replace(/\nREPORT_ID:[a-zA-Z0-9]+$/, '')
+      const cleanText = accumulated.replace(/\nREPORT_ID:[\w-]+$/, '')
       onCompletionChange?.(cleanText)
       onComplete?.(reportId)
     } catch (err) {

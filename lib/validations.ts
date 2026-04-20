@@ -25,7 +25,7 @@ export const profileStep3Schema = z.object({
 
 export const evaluateSchema = z.object({
   url: z.string().url().or(z.literal('')).optional(),
-  jdText: z.string().optional(),
+  jdText: z.string().max(50_000).optional(),
 }).refine(d => d.url || d.jdText, {
   message: 'Provide a URL or paste JD text',
 })
