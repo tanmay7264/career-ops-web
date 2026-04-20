@@ -14,7 +14,10 @@ const baseProfile: Profile = {
   currency: 'USD',
   superpower: 'I ship AI products fast',
   cvMarkdown: 'My CV content here',
-  createdAt: new Date(),
+  portalsYaml: '',
+  includeKw: '',
+  excludeKw: '',
+  onboardedAt: new Date(),
   updatedAt: new Date(),
 }
 

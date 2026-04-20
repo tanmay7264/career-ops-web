@@ -1,5 +1,9 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
 
+if (!process.env.ANTHROPIC_API_KEY) {
+  throw new Error('ANTHROPIC_API_KEY environment variable is not set')
+}
+
 const globalForAnthropic = globalThis as unknown as { anthropic: ReturnType<typeof createAnthropic> }
 
 export const anthropic = globalForAnthropic.anthropic || createAnthropic({
@@ -7,7 +11,3 @@ export const anthropic = globalForAnthropic.anthropic || createAnthropic({
 })
 
 if (process.env.NODE_ENV !== 'production') globalForAnthropic.anthropic = anthropic
-
-export function createAnthropicClient() {
-  return createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-}

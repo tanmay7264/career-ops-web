@@ -1,25 +1,21 @@
 import type { Profile } from './generated/prisma'
 
 export function buildEvaluationPrompt(profile: Profile, jdText: string, url?: string): string {
-  const salaryRange = profile.salaryMin && profile.salaryMax
-    ? `${profile.salaryMin}–${profile.salaryMax} ${profile.currency ?? 'USD'}`
-    : profile.salaryMin
-      ? `${profile.salaryMin}+ ${profile.currency ?? 'USD'}`
-      : 'Not specified'
+  const salaryRange = `${profile.salaryMin}–${profile.salaryMax} ${profile.currency ?? 'USD'}`
 
   const lines: string[] = [
     '# Job Offer Evaluation',
     '',
     '## Candidate Profile',
-    `- **Name:** ${profile.fullName ?? 'Not provided'}`,
-    `- **Location:** ${profile.location ?? 'Not provided'}`,
-    `- **Target Roles:** ${profile.targetRoles ?? 'Not specified'}`,
-    `- **Seniority:** ${profile.seniority ?? 'Not specified'}`,
+    `- **Name:** ${profile.fullName}`,
+    `- **Location:** ${profile.location}`,
+    `- **Target Roles:** ${profile.targetRoles}`,
+    `- **Seniority:** ${profile.seniority}`,
     `- **Salary Target:** ${salaryRange}`,
-    `- **Superpower:** ${profile.superpower ?? 'Not specified'}`,
+    `- **Superpower:** ${profile.superpower}`,
     '',
     '## Candidate CV',
-    profile.cvMarkdown ?? '(No CV provided)',
+    profile.cvMarkdown,
     '',
     '## Job Description',
   ]
@@ -47,13 +43,15 @@ export function buildEvaluationPrompt(profile: Profile, jdText: string, url?: st
   lines.push('')
   lines.push('**Block E: Application Strategy** — Should the candidate apply? Provide key talking points, angles to emphasize, and gaps to address.')
   lines.push('')
-  lines.push('**Block F: Score** — Give a final numeric score from 0.0 to 5.0 reflecting overall fit. Output on a single line as:')
-  lines.push('SCORE: X.X')
+  lines.push('**Block F: Score** — Give a final numeric score from 0.0 to 5.0 reflecting overall fit.')
+  lines.push('Output exactly: SCORE: X.X')
+  lines.push('where X.X is a number from 0.0 to 5.0 with exactly one decimal place (e.g. SCORE: 3.7).')
   lines.push('')
   lines.push('**Block G: Legitimacy** — Is this a real job posting or potentially fake/scam? Output one of:')
   lines.push('LEGITIMACY: REAL')
   lines.push('LEGITIMACY: SUSPICIOUS')
   lines.push('LEGITIMACY: FAKE')
+  lines.push('Output exactly one of the three lines above, with no other text on that line.')
 
   return lines.join('\n')
 }
