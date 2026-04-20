@@ -36,6 +36,22 @@ export const applicationUpdateSchema = z.object({
   score: z.number().optional(),
 })
 
+export const profileUpdateSchema = z.object({
+  fullName: z.string().min(2).optional(),
+  location: z.string().min(2).optional(),
+  targetRoles: z.string().min(2).optional(),
+  seniority: z.string().min(2).optional(),
+  salaryMin: z.number().min(1).optional(),
+  salaryMax: z.number().min(1).optional(),
+  currency: z.string().optional(),
+  superpower: z.string().min(10).optional(),
+  cvMarkdown: z.string().min(50).optional(),
+  portalsYaml: z.string().min(10).optional(),
+  includeKw: z.string().min(2).optional(),
+  excludeKw: z.string().optional(),
+})
+export type ProfileUpdate = z.infer<typeof profileUpdateSchema>
+
 export type ProfileStep1 = z.infer<typeof profileStep1Schema>
 export type ProfileStep2 = z.infer<typeof profileStep2Schema>
 export type ProfileStep3 = z.infer<typeof profileStep3Schema>

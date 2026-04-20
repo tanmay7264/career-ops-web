@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { profileUpdateSchema } from '@/lib/validations'
 
 const createProfileSchema = z.object({
   fullName: z.string().min(1),
@@ -39,10 +40,19 @@ export async function PUT(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json()
-  const profile = await prisma.profile.update({
-    where: { userId: session.user.id },
-    data: body,
-  })
-  return NextResponse.json(profile)
+  try {
+    const body = await req.json()
+    const parsed = profileUpdateSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const profile = await prisma.profile.update({
+      where: { userId: session.user.id },
+      data: parsed.data,
+    })
+    return NextResponse.json(profile)
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
