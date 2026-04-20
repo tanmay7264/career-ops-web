@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
     session: async ({ session, token }) => {
       if (session.user && token) {
         session.user.id = token.userId as string
-        ;(session as any).onboarded = token.onboarded
+        ;(session as { onboarded?: boolean }).onboarded = token.onboarded as boolean | undefined
       }
       return session
     },
